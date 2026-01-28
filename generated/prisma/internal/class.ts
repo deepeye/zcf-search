@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.3.0",
   "engineVersion": "9d6ad21cbbceab97458517b147a6a09ff43aa735",
   "activeProvider": "postgresql",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Search {\n  id        String   @id @default(cuid())\n  query     String\n  answer    String   @db.Text\n  sources   Json     @default(\"[]\")\n  createdAt DateTime @default(now())\n}\n",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\n/// Search 记录用户的搜索查询和 AI 生成的答案\nmodel Search {\n  /// 唯一标识符\n  id        String   @id @default(cuid())\n  /// 用户的搜索查询\n  query     String\n  /// AI 生成的答案\n  answer    String   @db.Text\n  /// 参考来源列表(JSON 数组)\n  sources   Json     @default(\"[]\")\n  /// 创建时间\n  createdAt DateTime @default(now())\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},

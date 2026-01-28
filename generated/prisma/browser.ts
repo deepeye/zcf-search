@@ -19,6 +19,6 @@ export * as $Enums from './enums'
 export * from './enums';
 /**
  * Model Search
- * 
+ * Search 记录用户的搜索查询和 AI 生成的答案
  */
 export type Search = Prisma.SearchModel

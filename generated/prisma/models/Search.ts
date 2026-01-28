@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace"
 
 /**
  * Model Search
- * 
+ * Search 记录用户的搜索查询和 AI 生成的答案
  */
 export type SearchModel = runtime.Types.Result.DefaultSelection<Prisma.$SearchPayload>
 
@@ -347,10 +347,25 @@ export type $SearchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Search"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    /**
+     * 唯一标识符
+     */
     id: string
+    /**
+     * 用户的搜索查询
+     */
     query: string
+    /**
+     * AI 生成的答案
+     */
     answer: string
+    /**
+     * 参考来源列表(JSON 数组)
+     */
     sources: runtime.JsonValue
+    /**
+     * 创建时间
+     */
     createdAt: Date
   }, ExtArgs["result"]["search"]>
   composites: {}

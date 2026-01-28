@@ -7,10 +7,16 @@ datasource db {
   provider = "postgresql"
 }
 
+/// Search 记录用户的搜索查询和 AI 生成的答案
 model Search {
+  /// 唯一标识符
   id        String   @id @default(cuid())
+  /// 用户的搜索查询
   query     String
+  /// AI 生成的答案
   answer    String   @db.Text
+  /// 参考来源列表(JSON 数组)
   sources   Json     @default("[]")
+  /// 创建时间
   createdAt DateTime @default(now())
 }
