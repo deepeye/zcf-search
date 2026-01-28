@@ -16,6 +16,28 @@ cp .env.example .env
 2. **Tavily API Key** - 用于网络搜索
    - 获取地址: https://tavily.com
 
+### 可选配置
+
+**使用兼容 OpenAI 协议的其他服务**
+
+如果你使用其他兼容 OpenAI API 的服务（如 Azure OpenAI、Anthropic Claude、本地部署的模型等），可以配置 `OPENAI_BASE_URL`:
+
+```bash
+# 示例: 使用 Azure OpenAI
+OPENAI_BASE_URL="https://your-resource.openai.azure.com/openai/deployments/your-deployment"
+
+# 示例: 使用本地模型 (如 Ollama)
+OPENAI_BASE_URL="http://localhost:11434/v1"
+
+# 示例: 使用其他兼容服务
+OPENAI_BASE_URL="https://api.deepseek.com/v1"
+```
+
+**注意**:
+- 如果不设置 `OPENAI_BASE_URL`，将使用 OpenAI 官方 API
+- 确保目标服务兼容 OpenAI API 格式
+- 某些服务可能需要调整模型名称
+
 ### 数据库配置 (可选)
 
 如果启用数据库功能,配置 `DATABASE_URL`:
