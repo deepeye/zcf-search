@@ -1,3 +1,10 @@
+export interface SearchResult {
+  title: string
+  url: string
+  content: string
+  score: number
+}
+
 export async function searchWeb(query: string): Promise<SearchResult[]> {
   if (!process.env.TAVILY_API_KEY) {
     throw new Error('TAVILY_API_KEY is not set')

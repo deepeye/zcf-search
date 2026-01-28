@@ -1,7 +1,7 @@
-import { OpenAI } from '@ai-sdk/openai'
+import { createOpenAI } from '@ai-sdk/openai'
 import { generateText } from 'ai'
 
-const openai = new OpenAI({
+const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
@@ -15,7 +15,6 @@ export async function generateAnswer(
     model: openai('gpt-4'),
     prompt,
     temperature: 0.7,
-    maxTokens: 2000,
   })
 
   return text
