@@ -1,5 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai'
-import { generateText } from 'ai'
+import { generateText, streamText } from 'ai'
 
 const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -49,4 +49,19 @@ ${sourcesText}
 5. 保持简洁但全面
 
 答案:`
+}
+
+export async function streamAnswer(
+  query: string,
+  sources: Array<{ title: string; content: string; url: string }>
+) {
+  const prompt = buildPrompt(query, sources)
+
+  const result = await streamText({
+    model: openai('gpt-4'),
+    prompt,
+    temperature: 0.7,
+  })
+
+  return result.toTextStreamResponse()
 }
