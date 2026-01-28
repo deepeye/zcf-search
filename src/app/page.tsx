@@ -4,18 +4,37 @@ import { useState } from 'react'
 import { SearchInput } from '@/components/SearchInput'
 import { AnswerDisplay } from '@/components/AnswerDisplay'
 import { SourcesList } from '@/components/SourcesList'
+import { MediaGallery } from '@/components/media/MediaGallery'
+import { SearchOptions } from '@/components/SearchOptions'
+import { searchWeb, searchImages, searchVideos } from '@/lib/search'
+import { generateAnswer } from '@/lib/ai'
+
+type SearchType = 'all' | 'images' | 'videos'
 
 interface SearchResult {
-  answer: string
-  sources: Array<{
+  answer?: string
+  sources?: Array<{
     title: string
     url: string
     content: string
+  }>
+  images?: Array<{
+    url: string
+    title: string
+    source: string
+  }>
+  videos?: Array<{
+    url: string
+    title: string
+    description: string
+    thumbnail: string
+    source: string
   }>
 }
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false)
+  const [searchType, setSearchType] = useState<SearchType>('all')
   const [result, setResult] = useState<SearchResult | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -25,19 +44,17 @@ export default function Home() {
     setResult(null)
 
     try {
-      const response = await fetch('/api/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || '搜索失败')
+      if (searchType === 'images') {
+        const images = await searchImages(query)
+        setResult({ images })
+      } else if (searchType === 'videos') {
+        const videos = await searchVideos(query)
+        setResult({ videos })
+      } else {
+        const sources = await searchWeb(query)
+        const answer = await generateAnswer(query, sources)
+        setResult({ answer, sources })
       }
-
-      const data = await response.json()
-      setResult(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : '搜索失败')
     } finally {
@@ -54,7 +71,12 @@ export default function Home() {
         </div>
 
         <div className="mb-8">
-          <SearchInput onSearch={handleSearch} isLoading={isLoading} placeholder="搜索任何内容..." />
+          <SearchOptions selected={searchType} onChange={setSearchType} />
+          <SearchInput
+            onSearch={handleSearch}
+            isLoading={isLoading}
+            placeholder="搜索任何内容..."
+          />
         </div>
 
         {error && (
@@ -66,11 +88,16 @@ export default function Home() {
         {result && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <AnswerDisplay answer={result.answer} isLoading={isLoading} />
+              {result.answer && <AnswerDisplay answer={result.answer} />}
+              {(result.images || result.videos) && (
+                <MediaGallery images={result.images} videos={result.videos} />
+              )}
             </div>
-            <div>
-              <SourcesList sources={result.sources} />
-            </div>
+            {result.sources && (
+              <div>
+                <SourcesList sources={result.sources} />
+              </div>
+            )}
           </div>
         )}
       </div>
