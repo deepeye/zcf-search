@@ -5,10 +5,11 @@ import { db } from '@/lib/db'
 // DELETE /api/history/[id] - 删除单条搜索历史
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
+    const { id } = await params
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: '未登录' }, { status: 401 })
@@ -16,7 +17,7 @@ export async function DELETE(
 
     await db.search.deleteMany({
       where: {
-        id: params.id,
+        id: id,
         userId: session.user.id,
       },
     })

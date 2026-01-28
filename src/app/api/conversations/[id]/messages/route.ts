@@ -5,10 +5,11 @@ import { db } from '@/lib/db'
 // POST /api/conversations/[id]/messages - 添加消息到对话
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
+    const { id } = await params
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: '未登录' }, { status: 401 })
@@ -19,7 +20,7 @@ export async function POST(
     // 验证对话所有权
     const conversation = await db.conversation.findFirst({
       where: {
-        id: params.id,
+        id: id,
         userId: session.user.id,
       },
     })
@@ -31,7 +32,7 @@ export async function POST(
     // 添加消息
     const message = await db.message.create({
       data: {
-        conversationId: params.id,
+        conversationId: id,
         role,
         content,
         sources: sources || [],
@@ -40,7 +41,7 @@ export async function POST(
 
     // 更新对话时间
     await db.conversation.update({
-      where: { id: params.id },
+      where: { id: id },
       data: { updatedAt: new Date() },
     })
 

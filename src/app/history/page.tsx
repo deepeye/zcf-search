@@ -10,7 +10,7 @@ interface Search {
   id: string
   query: string
   answer: string
-  sources: any
+  sources?: any
   createdAt: string
 }
 

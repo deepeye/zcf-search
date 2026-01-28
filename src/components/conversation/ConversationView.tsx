@@ -40,7 +40,11 @@ export function ConversationView({ conversationId }: ConversationViewProps) {
 
     try {
       // 添加用户消息
-      const userMessage = { role: 'user', content: query }
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        role: 'user',
+        content: query
+      }
       setMessages((prev) => [...prev, userMessage])
 
       // 执行搜索
@@ -51,7 +55,8 @@ export function ConversationView({ conversationId }: ConversationViewProps) {
       const answer = await generateAnswer(query, searchResults)
 
       // 添加助手消息
-      const assistantMessage = {
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: answer,
         sources: searchResults,

@@ -5,10 +5,11 @@ import { db } from '@/lib/db'
 // GET /api/conversations/[id] - 获取对话详情
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
+    const { id } = await params
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: '未登录' }, { status: 401 })
@@ -16,7 +17,7 @@ export async function GET(
 
     const conversation = await db.conversation.findFirst({
       where: {
-        id: params.id,
+        id: id,
         userId: session.user.id,
       },
       include: {
@@ -43,10 +44,11 @@ export async function GET(
 // DELETE /api/conversations/[id] - 删除对话
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
+    const { id } = await params
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: '未登录' }, { status: 401 })
@@ -54,7 +56,7 @@ export async function DELETE(
 
     await db.conversation.deleteMany({
       where: {
-        id: params.id,
+        id: id,
         userId: session.user.id,
       },
     })
