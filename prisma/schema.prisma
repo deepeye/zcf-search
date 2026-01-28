@@ -1,0 +1,16 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Search {
+  id        String   @id @default(cuid())
+  query     String
+  answer    String   @db.Text
+  sources   Json     @default("[]")
+  createdAt DateTime @default(now())
+}
