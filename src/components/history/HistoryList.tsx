@@ -3,6 +3,7 @@
 import useSWR from 'swr'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Trash2, Clock } from 'lucide-react'
 
 interface Search {
@@ -35,7 +36,18 @@ export function HistoryList({ onSelectSearch }: HistoryListProps) {
   }
 
   if (!data) {
-    return <div className="p-4">加载中...</div>
+    return (
+      <div className="space-y-3 p-4">
+        {[...Array(5)].map((_, i) => (
+          <Card key={i}>
+            <CardContent className="p-4">
+              <Skeleton className="h-4 w-3/4 mb-2" />
+              <Skeleton className="h-3 w-1/4" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
   }
 
   const { searches } = data
