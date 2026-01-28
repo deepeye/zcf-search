@@ -37,11 +37,13 @@ export default function Home() {
   const [searchType, setSearchType] = useState<SearchType>('all')
   const [result, setResult] = useState<SearchResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [streamingAnswer, setStreamingAnswer] = useState('')
 
   const handleSearch = async (query: string) => {
     setIsLoading(true)
     setError(null)
     setResult(null)
+    setStreamingAnswer('')
 
     try {
       if (searchType === 'images') {
@@ -51,9 +53,34 @@ export default function Home() {
         const videos = await searchVideos(query)
         setResult({ videos })
       } else {
+        // 对于文本搜索
         const sources = await searchWeb(query)
-        const answer = await generateAnswer(query, sources)
-        setResult({ answer, sources })
+        setResult({ sources })
+
+        // 获取流式响应
+        const response = await fetch('/api/search/stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query }),
+        })
+
+        if (!response.ok) {
+          throw new Error('搜索失败')
+        }
+
+        // 读取流式响应
+        const reader = response.body?.getReader()
+        const decoder = new TextDecoder()
+
+        if (reader) {
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+
+            const chunk = decoder.decode(value)
+            setStreamingAnswer((prev) => prev + chunk)
+          }
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '搜索失败')
@@ -61,6 +88,8 @@ export default function Home() {
       setIsLoading(false)
     }
   }
+
+  const displayAnswer = streamingAnswer || result?.answer
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -88,7 +117,7 @@ export default function Home() {
         {result && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              {result.answer && <AnswerDisplay answer={result.answer} />}
+              {displayAnswer && <AnswerDisplay answer={displayAnswer} isLoading={isLoading} />}
               {(result.images || result.videos) && (
                 <MediaGallery images={result.images} videos={result.videos} />
               )}

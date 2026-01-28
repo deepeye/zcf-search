@@ -2,6 +2,7 @@
 
 import useSWR from 'swr'
 import { Card } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { MessageSquare } from 'lucide-react'
 
 interface Conversation {
@@ -29,7 +30,16 @@ export function ConversationList({
   }
 
   if (!conversations) {
-    return <div className="p-4">加载中...</div>
+    return (
+      <div className="space-y-2 p-4">
+        {[...Array(5)].map((_, i) => (
+          <Card key={i} className="p-3">
+            <Skeleton className="h-4 w-3/4 mb-2" />
+            <Skeleton className="h-3 w-1/4" />
+          </Card>
+        ))}
+      </div>
+    )
   }
 
   if (conversations.length === 0) {
