@@ -40,10 +40,62 @@ OPENAI_BASE_URL="https://api.deepseek.com/v1"
 
 ### 数据库配置 (可选)
 
-如果启用数据库功能,配置 `DATABASE_URL`:
+#### 方式一: 使用 Docker Compose (推荐)
+
+1. **启动 PostgreSQL 容器:**
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **验证容器运行:**
+   ```bash
+   docker-compose ps
+   ```
+
+3. **查看日志:**
+   ```bash
+   docker-compose logs postgres
+   ```
+
+4. **停止容器:**
+   ```bash
+   docker-compose down
+   ```
+
+5. **删除数据:**
+   ```bash
+   docker-compose down -v
+   ```
+
+**默认配置:**
+- 用户名: `zcfsearch`
+- 密码: `zcfsearch_password`
+- 数据库: `zcf_search`
+- 端口: `5432`
+
+如需修改，请编辑 `.env` 文件中的 `POSTGRES_*` 变量。
+
+#### 方式二: 使用外部 PostgreSQL
+
+如果你有自己的 PostgreSQL 实例，配置 `DATABASE_URL`:
 
 ```
-DATABASE_URL="postgresql://user:password@localhost:5432/zcf_search"
+DATABASE_URL="postgresql://user:password@host:port/database?schema=public"
+```
+
+#### 初始化数据库
+
+启动数据库后，运行 Prisma 迁移:
+
+```bash
+npx prisma generate
+npx prisma db push
+```
+
+或者使用 Prisma Studio 查看数据:
+
+```bash
+npx prisma studio
 ```
 
 ## 启动开发服务器

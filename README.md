@@ -34,17 +34,25 @@ AI 驱动的智能搜索引擎,基于 Scira.ai 设计。
 
    编辑 `.env` 并填入你的 API 密钥。
 
-3. 初始化数据库:
+3. 启动数据库 (Docker Compose):
    ```bash
-   npx prisma generate
+   docker-compose up -d
    ```
 
-4. 启动开发服务器:
+   详细说明见 [本地开发指南](docs/local-development.md)。
+
+4. 初始化数据库:
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
+
+5. 启动开发服务器:
    ```bash
    npm run dev
    ```
 
-5. 访问 http://localhost:3000
+6. 访问 http://localhost:3000
 
 ## 项目结构
 
