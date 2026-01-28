@@ -19,4 +19,135 @@ model Search {
   sources   Json     @default("[]")
   /// 创建时间
   createdAt DateTime @default(now())
+
+  /// 关联用户 (可选，支持匿名搜索)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+
+/// User 表示应用用户
+model User {
+  /// 唯一标识符
+  id            String    @id @default(cuid())
+  /// 用户名称
+  name          String?
+  /// 用户邮箱
+  email         String?   @unique
+  /// 用户头像
+  image         String?
+  /// OAuth 提供商 (google, github)
+  provider      String?
+  /// OAuth 账户 ID
+  providerAccountId String?
+  /// 创建时间
+  createdAt     DateTime  @default(now())
+  /// 最后登录时间
+  lastLoginAt   DateTime  @default(now())
+  /// 用户的搜索记录
+  searches      Search[]
+  /// 用户的对话
+  conversations Conversation[]
+  /// 账户关联
+  accounts      Account[]
+  /// 会话关联
+  sessions      Session[]
+
+  @@index([email])
+}
+
+/// Account 用于 OAuth 账户关联
+model Account {
+  /// 唯一标识符
+  id                String  @id @default(cuid())
+  /// 关联用户
+  userId            String
+  /// 账户类型 (oauth)
+  type              String
+  /// OAuth 提供商
+  provider          String
+  /// 提供商账户 ID
+  providerAccountId String
+  /// 刷新令牌
+  refresh_token     String? @db.Text
+  /// 访问令牌
+  access_token      String? @db.Text
+  /// 令牌过期时间
+  expires_at        Int?
+  /// 令牌类型
+  token_type        String?
+  /// 作用域
+  scope             String?
+  /// ID 令牌
+  id_token          String? @db.Text
+  /// 会话状态
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+/// Session 用于用户会话管理
+model Session {
+  /// 唯一标识符
+  id           String   @id @default(cuid())
+  /// 会话令牌
+  sessionToken String   @unique
+  /// 关联用户
+  userId       String
+  /// 过期时间
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// VerificationToken 用于邮箱验证
+model VerificationToken {
+  /// 标识符
+  identifier String
+  /// 令牌
+  token      String   @unique
+  /// 过期时间
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+/// Conversation 表示多轮对话
+model Conversation {
+  /// 唯一标识符
+  id        String   @id @default(cuid())
+  /// 对话标题
+  title     String
+  /// 创建时间
+  createdAt DateTime @default(now())
+  /// 更新时间
+  updatedAt DateTime @updatedAt
+  /// 关联用户
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// 对话消息
+  messages  Message[]
+
+  @@index([userId])
+}
+
+/// Message 表示对话中的单条消息
+model Message {
+  /// 唯一标识符
+  id             String   @id @default(cuid())
+  /// 关联对话
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  /// 角色类型
+  role           String // 'user' | 'assistant' | 'system'
+  /// 消息内容
+  content        String   @db.Text
+  /// AI 使用的来源 (仅 assistant 消息)
+  sources        Json?    @default("[]")
+  /// 创建时间
+  createdAt      DateTime @default(now())
+
+  @@index([conversationId])
 }
